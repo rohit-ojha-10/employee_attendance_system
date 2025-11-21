@@ -1,0 +1,353 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Shadcn Zinc Theme (Light Mode) */
+  --background: #ffffff;
+  --foreground: #09090b;
+
+  --card: #ffffff;
+  --card-foreground: #09090b;
+
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
+
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #18181b;
+
+  --radius: 0.5rem;
+
+  --sidebar-width: 250px;
+  --sidebar-bg: #18181b;
+  --sidebar-fg: #fafafa;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #f4f4f5;
+  /* Zinc 100 for app background */
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-fg);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  border-right: 1px solid var(--border);
+}
+
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem;
+}
+
+.nav-item {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  color: #a1a1aa;
+  text-decoration: none;
+  border-radius: var(--radius);
+  margin-bottom: 0.25rem;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.sidebar-footer {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-info {
+  margin-bottom: 1rem;
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: transparent;
+  color: #a1a1aa;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+}
+
+.top-bar {
+  background-color: var(--background);
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.content-area {
+  padding: 2rem;
+}
+
+/* Cards */
+.card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+/* Inputs */
+input,
+select,
+textarea {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--foreground);
+  background-color: transparent;
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  /* Ensure padding doesn't affect width */
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 1px var(--ring);
+}
+
+label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.375rem;
+  color: var(--foreground);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+/* Buttons */
+.btn,
+button[type="submit"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border: none;
+}
+
+.btn-primary,
+.login-btn {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.btn-primary:hover,
+.login-btn:hover {
+  background-color: #27272a;
+  /* Zinc 800 */
+}
+
+.btn-danger {
+  background-color: var(--destructive);
+  color: var(--destructive-foreground);
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+
+/* Dashboard */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Attendance */
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Tables */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table th {
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+.table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-badge.pending {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.status-badge.approved,
+.status-badge.completed {
+  background-color: #d1fae5;
+  color: #047857;
+}
+
+.status-badge.rejected {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.status-badge.in-progress {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* Alerts */
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  background-color: #d1fae5;
+  color: #065f46;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.error-message {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  background-color: #fee2e2;
+  color: #b91c1c;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+/* Login Page Specifics */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f4f5;
+}
+
+.login-card {
+  background-color: var(--card);
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid var(--border);
+}
+
+.login-title {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+  text-align: center;
+  color: var(--muted-foreground);
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.login-btn {
+  width: 100%;
+  margin-top: 1rem;
+}
