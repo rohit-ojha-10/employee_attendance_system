@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import AuthContext from '../context/AuthContext';
 
 const Leave = () => {
@@ -27,7 +27,7 @@ const Leave = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.get('http://localhost:5000/api/leaves/my-leaves', config);
+            const { data } = await api.get('/api/leaves/my-leaves', config);
             setLeaves(data);
         } catch (error) {
             console.error(error);
@@ -42,8 +42,8 @@ const Leave = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            await axios.post(
-                'http://localhost:5000/api/leaves/apply',
+            await api.post(
+                '/api/leaves/apply',
                 { leaveType, startDate, endDate, reason },
                 config
             );

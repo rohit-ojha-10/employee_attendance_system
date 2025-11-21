@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import AuthContext from '../context/AuthContext';
 
 const Tasks = () => {
@@ -31,7 +31,7 @@ const Tasks = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.get('http://localhost:5000/api/tasks/my-tasks', config);
+            const { data } = await api.get('/api/tasks/my-tasks', config);
             setTasks(data);
         } catch (error) {
             console.error(error);
@@ -45,7 +45,7 @@ const Tasks = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.get('http://localhost:5000/api/tasks/users', config);
+            const { data } = await api.get('/api/tasks/users', config);
             setUsers(data);
             if (data.length > 0) {
                 setAssignedTo(data[0]._id);
@@ -63,8 +63,8 @@ const Tasks = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            await axios.post(
-                'http://localhost:5000/api/tasks',
+            await api.post(
+                '/api/tasks',
                 { title, description, assignedTo, dueDate },
                 config
             );
@@ -84,8 +84,8 @@ const Tasks = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            await axios.put(
-                `http://localhost:5000/api/tasks/${id}/status`,
+            await api.put(
+                `/api/tasks/${id}/status`,
                 { status },
                 config
             );

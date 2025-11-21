@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import AuthContext from '../context/AuthContext';
 
 const Attendance = () => {
@@ -25,7 +25,7 @@ const Attendance = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.get('http://localhost:5000/api/attendance/my-attendance', config);
+            const { data } = await api.get('/api/attendance/my-attendance', config);
             setAttendance(data);
 
             // Check if already checked in today
@@ -47,7 +47,7 @@ const Attendance = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            await axios.post('http://localhost:5000/api/attendance/checkin', {}, config);
+            await api.post('/api/attendance/checkin', {}, config);
             setMessage('Checked In Successfully!');
             fetchAttendance();
         } catch (error) {
@@ -62,7 +62,7 @@ const Attendance = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            await axios.post('http://localhost:5000/api/attendance/checkout', {}, config);
+            await api.post('/api/attendance/checkout', {}, config);
             setMessage('Checked Out Successfully!');
             fetchAttendance();
         } catch (error) {
