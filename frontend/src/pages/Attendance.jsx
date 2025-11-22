@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import api from '../utils/api';
 import AuthContext from '../context/AuthContext';
+import TaskHoursModal from '../components/TaskHoursModal';
 
 const Attendance = () => {
     const { user, loading } = useContext(AuthContext);
@@ -8,10 +9,14 @@ const Attendance = () => {
     const [todayStatus, setTodayStatus] = useState(null);
     const [componentLoading, setComponentLoading] = useState(true);
     const [message, setMessage] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentWorkHours, setCurrentWorkHours] = useState(0);
+    const [tasks, setTasks] = useState([]);
 
     useEffect(() => {
         if (user) {
             fetchAttendance();
+            fetchTasks();
         }
     }, [user]);
 
@@ -33,10 +38,25 @@ const Attendance = () => {
             const todayRecord = data.find(a => a.date === today);
             setTodayStatus(todayRecord);
 
-            setLoading(false);
+            setComponentLoading(false);
         } catch (error) {
             console.error(error);
-            setLoading(false);
+            setComponentLoading(false);
+        }
+    };
+
+    const fetchTasks = async () => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+            const { data } = await api.get('/api/tasks/my-tasks', config);
+            // Filter out completed tasks if needed, or show all. Let's show all pending/in-progress
+            setTasks(data.filter(task => task.status !== 'Completed'));
+        } catch (error) {
+            console.error('Error fetching tasks:', error);
         }
     };
 
@@ -55,18 +75,29 @@ const Attendance = () => {
         }
     };
 
-    const handleCheckOut = async () => {
+    const handleCheckOutClick = () => {
+        if (todayStatus && todayStatus.checkIn) {
+            const checkInTime = new Date(todayStatus.checkIn);
+            const now = new Date();
+            const duration = (now - checkInTime) / (1000 * 60 * 60);
+            setCurrentWorkHours(duration);
+            setIsModalOpen(true);
+        }
+    };
+
+    const submitCheckOut = async (taskHours) => {
         try {
             const config = {
                 headers: {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            await api.post('/api/attendance/checkout', {}, config);
+            await api.post('/api/attendance/checkout', { taskHours }, config);
             setMessage('Checked Out Successfully!');
+            setIsModalOpen(false);
             fetchAttendance();
         } catch (error) {
-            setMessage(error.response.data.message);
+            setMessage(error.response?.data?.message || 'Error checking out');
         }
     };
 
@@ -81,7 +112,7 @@ const Attendance = () => {
                     {!todayStatus ? (
                         <button onClick={handleCheckIn} className="btn btn-primary">Punch In</button>
                     ) : !todayStatus.checkOut ? (
-                        <button onClick={handleCheckOut} className="btn btn-danger">Punch Out</button>
+                        <button onClick={handleCheckOutClick} className="btn btn-danger">Punch Out</button>
                     ) : (
                         <div className="completed-status">
                             <p>You have completed your work day.</p>
@@ -116,6 +147,14 @@ const Attendance = () => {
                     </tbody>
                 </table>
             </div>
+
+            <TaskHoursModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSubmit={submitCheckOut}
+                tasks={tasks}
+                totalWorkHours={currentWorkHours}
+            />
         </div>
     );
 };

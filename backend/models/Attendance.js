@@ -24,7 +24,13 @@ const attendanceSchema = new mongoose.Schema({
     workHours: {
         type: Number, // Duration in hours
         default: 0,
-    }
+    },
+    taskHours: [{
+        taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task', required: true },
+        taskTitle: { type: String },
+        project: { type: String },
+        hours: { type: Number, required: true, default: 0 }
+    }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Attendance', attendanceSchema);

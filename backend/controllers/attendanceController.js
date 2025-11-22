@@ -51,6 +51,20 @@ const checkOut = async (req, res) => {
         const duration = (attendance.checkOut - attendance.checkIn) / (1000 * 60 * 60); // in hours
         attendance.workHours = duration.toFixed(2);
 
+        // Handle Task Hours
+        const { taskHours } = req.body;
+        if (taskHours && Array.isArray(taskHours)) {
+            const totalTaskHours = taskHours.reduce((acc, curr) => acc + Number(curr.hours), 0);
+
+            // Allow a small margin of error (e.g., 0.1 hours) for floating point comparisons or user estimation
+            if (totalTaskHours > duration + 0.1) {
+                return res.status(400).json({
+                    message: `Total task hours (${totalTaskHours.toFixed(2)}) cannot exceed work hours (${duration.toFixed(2)})`
+                });
+            }
+            attendance.taskHours = taskHours;
+        }
+
         await attendance.save();
 
         res.json(attendance);

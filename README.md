@@ -65,7 +65,32 @@ This is a comprehensive full-stack solution designed to manage employee attendan
    ```bash
    npm run dev
    ```
+   ```
    The application will open at `http://localhost:5173`.
+
+## Development Tools
+
+### Reset Test User Script
+A utility script is available to quickly reset the database with a test user and generated data. This is useful for testing the dashboard and attendance features.
+
+**What it does:**
+1.  **Cleans Up**: Deletes the existing `test@example.com` user, their tasks, and attendance records.
+2.  **Creates User**: Registers a new `test@example.com` user with password `password123`.
+3.  **Assigns Tasks**: Creates 5 default tasks (linked to Projects A, B, D) with random statuses.
+4.  **Generates History**: Creates 7 days of historical attendance data with:
+    -   Random check-in/out times.
+    -   Random work hours (some < 4 hours for Absent, some < 9 hours for Early Leave).
+    -   Task hours distributed among assigned tasks.
+
+**How to run:**
+1.  Navigate to the backend directory:
+    ```bash
+    cd backend
+    ```
+2.  Run the script:
+    ```bash
+    npm run reset-user
+    ```
 
 ## API Endpoints
 

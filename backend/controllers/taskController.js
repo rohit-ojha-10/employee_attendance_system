@@ -5,7 +5,7 @@ const User = require('../models/User');
 // @route   POST /api/tasks
 // @access  Private/Admin
 const createTask = async (req, res) => {
-    const { title, description, assignedTo, dueDate } = req.body;
+    const { title, description, assignedTo, dueDate, project } = req.body;
 
     try {
         const task = await Task.create({
@@ -14,6 +14,7 @@ const createTask = async (req, res) => {
             assignedTo,
             assignedBy: req.user._id,
             dueDate,
+            project,
         });
 
         res.status(201).json(task);
