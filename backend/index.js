@@ -23,6 +23,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/attendance', require('./routes/attendanceRoutes'));
 app.use('/api/leaves', require('./routes/leaveRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use('/api/rules', require('./routes/ruleRoutes'));
+app.use('/api/alerts', require('./routes/alertRoutes'));
+app.use('/api/system', require('./routes/systemRoutes'));
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/unified_employee_system', {

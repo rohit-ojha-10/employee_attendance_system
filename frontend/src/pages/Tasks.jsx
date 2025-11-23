@@ -8,6 +8,7 @@ const Tasks = () => {
     const [users, setUsers] = useState([]);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [project, setProject] = useState('');
     const [assignedTo, setAssignedTo] = useState('');
     const [dueDate, setDueDate] = useState('');
     const [message, setMessage] = useState('');
@@ -65,12 +66,13 @@ const Tasks = () => {
             };
             await api.post(
                 '/api/tasks',
-                { title, description, assignedTo, dueDate },
+                { title, description, project, assignedTo, dueDate },
                 config
             );
             setMessage('Task assigned successfully!');
             setTitle('');
             setDescription('');
+            setProject('');
             setDueDate('');
         } catch (error) {
             setMessage(error.response.data.message);
@@ -92,6 +94,40 @@ const Tasks = () => {
             fetchTasks();
         } catch (error) {
             console.error(error);
+        }
+    };
+
+    const [activeTaskId, setActiveTaskId] = useState(null);
+    const [startTime, setStartTime] = useState(null);
+
+    const startTimer = (taskId) => {
+        setActiveTaskId(taskId);
+        setStartTime(new Date());
+    };
+
+    const stopTimer = async (taskId) => {
+        if (!startTime) return;
+        const endTime = new Date();
+        const duration = (endTime - startTime) / 1000 / 60; // in minutes
+
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+            await api.put(
+                `/api/tasks/${taskId}/log-time`,
+                { startTime, endTime, duration },
+                config
+            );
+            setActiveTaskId(null);
+            setStartTime(null);
+            alert(`Logged ${duration.toFixed(2)} minutes`);
+            fetchTasks(); // Refresh to show updated data if we displayed it
+        } catch (error) {
+            console.error(error);
+            alert('Failed to log time');
         }
     };
 
@@ -121,6 +157,16 @@ const Tasks = () => {
                                 rows="2"
                                 style={{ width: '100%', padding: '0.5rem' }}
                             ></textarea>
+                        </div>
+                        <div className="form-group">
+                            <label>Project</label>
+                            <input
+                                type="text"
+                                value={project}
+                                onChange={(e) => setProject(e.target.value)}
+                                placeholder="e.g., Website Redesign"
+                                required
+                            />
                         </div>
                         <div className="form-group">
                             <label>Assign To</label>
@@ -157,9 +203,12 @@ const Tasks = () => {
                                 </div>
                                 <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>{task.description}</p>
                                 <p style={{ fontSize: '0.8rem' }}>Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}</p>
+                                {task.productivityScore > 0 && (
+                                    <p style={{ fontSize: '0.8rem', color: 'green' }}>Productivity Score: {task.productivityScore.toFixed(1)}</p>
+                                )}
 
                                 {task.status !== 'Completed' && (
-                                    <div style={{ marginTop: '1rem' }}>
+                                    <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
                                         {task.status === 'Pending' && (
                                             <button
                                                 onClick={() => updateStatus(task._id, 'In Progress')}
@@ -170,13 +219,33 @@ const Tasks = () => {
                                             </button>
                                         )}
                                         {task.status === 'In Progress' && (
-                                            <button
-                                                onClick={() => updateStatus(task._id, 'Completed')}
-                                                className="btn"
-                                                style={{ backgroundColor: '#10b981', color: 'white', padding: '0.5rem', fontSize: '0.8rem' }}
-                                            >
-                                                Mark Completed
-                                            </button>
+                                            <>
+                                                {activeTaskId === task._id ? (
+                                                    <button
+                                                        onClick={() => stopTimer(task._id)}
+                                                        className="btn"
+                                                        style={{ backgroundColor: '#ef4444', color: 'white', padding: '0.5rem', fontSize: '0.8rem' }}
+                                                    >
+                                                        Stop Timer
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => startTimer(task._id)}
+                                                        className="btn"
+                                                        style={{ backgroundColor: '#3b82f6', color: 'white', padding: '0.5rem', fontSize: '0.8rem' }}
+                                                        disabled={activeTaskId !== null}
+                                                    >
+                                                        Start Timer
+                                                    </button>
+                                                )}
+                                                <button
+                                                    onClick={() => updateStatus(task._id, 'Completed')}
+                                                    className="btn"
+                                                    style={{ backgroundColor: '#10b981', color: 'white', padding: '0.5rem', fontSize: '0.8rem' }}
+                                                >
+                                                    Mark Completed
+                                                </button>
+                                            </>
                                         )}
                                     </div>
                                 )}

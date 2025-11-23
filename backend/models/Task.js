@@ -30,6 +30,15 @@ const taskSchema = new mongoose.Schema({
     dueDate: {
         type: Date,
     },
+    timeLogs: [{
+        startTime: Date,
+        endTime: Date,
+        duration: Number // in minutes
+    }],
+    productivityScore: {
+        type: Number,
+        default: 0
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);

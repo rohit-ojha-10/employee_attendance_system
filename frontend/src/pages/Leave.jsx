@@ -5,6 +5,7 @@ import AuthContext from '../context/AuthContext';
 const Leave = () => {
     const { user, loading } = useContext(AuthContext);
     const [leaves, setLeaves] = useState([]);
+    const [allLeaves, setAllLeaves] = useState([]);
     const [leaveType, setLeaveType] = useState('Sick');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
@@ -14,6 +15,9 @@ const Leave = () => {
     useEffect(() => {
         if (user) {
             fetchLeaves();
+            if (user.role === 'admin' || user.role === 'hr') {
+                fetchAllLeaves();
+            }
         }
     }, [user]);
 
@@ -29,6 +33,20 @@ const Leave = () => {
             };
             const { data } = await api.get('/api/leaves/my-leaves', config);
             setLeaves(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchAllLeaves = async () => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+            const { data } = await api.get('/api/leaves/all', config);
+            setAllLeaves(data);
         } catch (error) {
             console.error(error);
         }
@@ -54,6 +72,26 @@ const Leave = () => {
             setEndDate('');
         } catch (error) {
             setMessage(error.response.data.message);
+        }
+    };
+
+    const updateLeaveStatus = async (id, status) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+            await api.put(
+                `/api/leaves/${id}/status`,
+                { status },
+                config
+            );
+            setMessage(`Leave ${status.toLowerCase()} successfully!`);
+            fetchAllLeaves();
+            fetchLeaves();
+        } catch (error) {
+            setMessage('Failed to update leave status');
         }
     };
 
@@ -104,6 +142,61 @@ const Leave = () => {
                     <button type="submit" className="btn btn-primary">Apply</button>
                 </form>
             </div>
+
+            {(user.role === 'admin' || user.role === 'hr') && (
+                <div className="card">
+                    <h4>All Leave Requests (Admin)</h4>
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Type</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {allLeaves.map((leave) => (
+                                <tr key={leave._id}>
+                                    <td>{leave.user?.name || 'N/A'}</td>
+                                    <td>{leave.leaveType}</td>
+                                    <td>{new Date(leave.startDate).toLocaleDateString()}</td>
+                                    <td>{new Date(leave.endDate).toLocaleDateString()}</td>
+                                    <td>{leave.reason}</td>
+                                    <td>
+                                        <span className={`status-badge ${leave.status.toLowerCase()}`}>
+                                            {leave.status}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {leave.status === 'Pending' && (
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                <button
+                                                    onClick={() => updateLeaveStatus(leave._id, 'Approved')}
+                                                    className="btn"
+                                                    style={{ backgroundColor: '#10b981', color: 'white', padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}
+                                                >
+                                                    Approve
+                                                </button>
+                                                <button
+                                                    onClick={() => updateLeaveStatus(leave._id, 'Rejected')}
+                                                    className="btn"
+                                                    style={{ backgroundColor: '#ef4444', color: 'white', padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}
+                                                >
+                                                    Reject
+                                                </button>
+                                            </div>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             <div className="card">
                 <h4>My Leaves</h4>

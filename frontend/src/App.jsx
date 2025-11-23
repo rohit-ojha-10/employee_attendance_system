@@ -6,6 +6,8 @@ import Dashboard from './pages/Dashboard';
 import Attendance from './pages/Attendance';
 import Leave from './pages/Leave';
 import Tasks from './pages/Tasks';
+import Rules from './pages/Rules';
+import Admin from './pages/Admin';
 import Layout from './components/Layout';
 import './index.css';
 
@@ -22,6 +24,8 @@ function App() {
             <Route path="attendance" element={<Attendance />} />
             <Route path="leaves" element={<Leave />} />
             <Route path="tasks" element={<Tasks />} />
+            <Route path="rules" element={<Rules />} />
+            <Route path="admin" element={<Admin />} />
           </Route>
         </Routes>
       </Router>

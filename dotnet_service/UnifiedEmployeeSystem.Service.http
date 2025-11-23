@@ -1,0 +1,6 @@
+@UnifiedEmployeeSystem.Service_HostAddress = http://localhost:5192
+
+GET {{UnifiedEmployeeSystem.Service_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

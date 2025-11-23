@@ -74,4 +74,30 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-module.exports = { createTask, getMyTasks, updateTaskStatus, getAllUsers };
+// @desc    Log Time for Task
+// @route   PUT /api/tasks/:id/log-time
+// @access  Private
+const logTime = async (req, res) => {
+    const { startTime, endTime, duration } = req.body;
+
+    try {
+        const task = await Task.findById(req.params.id);
+
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        if (task.assignedTo.toString() !== req.user._id.toString()) {
+            return res.status(401).json({ message: 'Not authorized' });
+        }
+
+        task.timeLogs.push({ startTime, endTime, duration });
+        await task.save();
+
+        res.json(task);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
+};
+
+module.exports = { createTask, getMyTasks, updateTaskStatus, getAllUsers, logTime };

@@ -18,7 +18,24 @@ const Dashboard = () => {
     const [dailyHoursData, setDailyHoursData] = useState([]);
     const [taskDistributionData, setTaskDistributionData] = useState([]);
     const [tasks, setTasks] = useState([]);
+    const [alerts, setAlerts] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const triggerSystemAction = async (action) => {
+        try {
+            const config = {
+                headers: { Authorization: `Bearer ${user.token}` }
+            };
+            await api.post(`/api/system/${action}`, {}, config);
+            alert(`Action ${action} triggered successfully`);
+            // Refresh alerts
+            const alertsRes = await api.get('/api/alerts', config);
+            setAlerts(alertsRes.data);
+        } catch (error) {
+            console.error(error);
+            alert('Failed to trigger action');
+        }
+    };
 
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
@@ -29,10 +46,11 @@ const Dashboard = () => {
                     headers: { Authorization: `Bearer ${user.token}` }
                 };
 
-                const [attendanceRes, leavesRes, tasksRes] = await Promise.all([
+                const [attendanceRes, leavesRes, tasksRes, alertsRes] = await Promise.all([
                     api.get('/api/attendance/my-attendance', config),
                     api.get('/api/leaves/my-leaves', config),
-                    api.get('/api/tasks/my-tasks', config)
+                    api.get('/api/tasks/my-tasks', config),
+                    api.get('/api/alerts', config)
                 ]);
 
                 const attendance = attendanceRes.data;
@@ -47,6 +65,7 @@ const Dashboard = () => {
                 setDailyHoursData(processDailyHours(attendance));
                 setTaskDistributionData(processTaskDistribution(allTasks));
                 setTasks(allTasks);
+                setAlerts(alertsRes.data);
 
                 setLoading(false);
             } catch (error) {
@@ -213,6 +232,43 @@ const Dashboard = () => {
                 </div>
 
             </div>
+
+            {/* Alerts Section */}
+            <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                <h3 className="text-xl font-bold text-gray-800 mb-4">System Alerts</h3>
+                {alerts.length === 0 ? <p className="text-gray-500">No active alerts.</p> : (
+                    <div className="space-y-4">
+                        {alerts.map(alert => (
+                            <div key={alert._id} className="p-4 border-l-4 border-red-500 bg-red-50 rounded">
+                                <h5 className="font-bold text-red-700">{alert.type}</h5>
+                                <p className="text-red-600">{alert.message}</p>
+                                <small className="text-red-400">{new Date(alert.generatedAt).toLocaleString()}</small>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* System Actions (Admin Only) */}
+            {user.role === 'admin' && (
+                <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4">System Actions (.NET Service)</h3>
+                    <div className="flex gap-4">
+                        <button onClick={() => triggerSystemAction('reconcile')} className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                            Run Reconciliation
+                        </button>
+                        <button onClick={() => triggerSystemAction('calculate-productivity')} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                            Calc Productivity
+                        </button>
+                        <button onClick={() => triggerSystemAction('evaluate-rules')} className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">
+                            Evaluate Rules
+                        </button>
+                        <button onClick={() => triggerSystemAction('run-all')} className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900">
+                            Run All Checks
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
