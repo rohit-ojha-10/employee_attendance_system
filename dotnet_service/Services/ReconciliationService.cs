@@ -29,10 +29,17 @@ namespace UnifiedEmployeeSystem.Service.Services
             {
                 // Check if there is attendance during leave period
                 var conflictingAttendance = attendances.FirstOrDefault(a => 
-                    a.User == leave.User && 
-                    string.Compare(a.Date, leave.StartDate) >= 0 && 
-                    string.Compare(a.Date, leave.EndDate) <= 0 &&
-                    a.Status == "Present");
+                {
+                    if (a.User != leave.User || a.Status != "Present") return false;
+                    
+                    // Parse attendance date string (YYYY-MM-DD) to DateTime for comparison
+                    if (DateTime.TryParse(a.Date, out DateTime attendanceDate))
+                    {
+                        return attendanceDate.Date >= leave.StartDate.Date && 
+                               attendanceDate.Date <= leave.EndDate.Date;
+                    }
+                    return false;
+                });
 
                 if (conflictingAttendance != null)
                 {

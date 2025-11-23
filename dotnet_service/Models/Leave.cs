@@ -19,10 +19,10 @@ namespace UnifiedEmployeeSystem.Service.Models
         public string LeaveType { get; set; }
 
         [BsonElement("startDate")]
-        public string StartDate { get; set; }
+        public DateTime StartDate { get; set; }
 
         [BsonElement("endDate")]
-        public string EndDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         [BsonElement("status")]
         public string Status { get; set; } // Pending, Approved, Rejected

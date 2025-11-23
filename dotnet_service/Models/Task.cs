@@ -5,19 +5,27 @@ using System.Collections.Generic;
 
 namespace UnifiedEmployeeSystem.Service.Models
 {
+    [BsonIgnoreExtraElements]
     public class Task
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
+        [BsonElement("title")]
         public string Title { get; set; }
         
+        [BsonElement("assignedTo")]
         [BsonRepresentation(BsonType.ObjectId)]
         public string AssignedTo { get; set; }
 
+        [BsonElement("status")]
         public string Status { get; set; }
+
+        [BsonElement("timeLogs")]
         public List<TimeLog> TimeLogs { get; set; }
+
+        [BsonElement("productivityScore")]
         public double ProductivityScore { get; set; }
     }
 
