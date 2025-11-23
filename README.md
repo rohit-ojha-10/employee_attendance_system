@@ -1,96 +1,134 @@
 # Unified Employee Attendance & Productivity System
 
 ## Overview
-This is a comprehensive full-stack solution designed to manage employee attendance, leave tracking, productivity monitoring, and access control. It features a modern, responsive UI and a robust backend API.
+This is a comprehensive full-stack solution designed to manage employee attendance, leave tracking, productivity monitoring, and access control. It features a modern, responsive UI, a robust backend API, and a .NET microservice for advanced analytics and rule evaluation.
 
 ## Features
-- **Authentication**: Secure user registration and login using JWT. Role-based access control (Admin vs. Employee).
-- **Dashboard**: Interactive dashboard with quick stats and navigation.
+- **Authentication**: Secure user registration and login using JWT. Role-based access control (Admin, HR, Employee).
+- **Admin Panel**: Dedicated admin interface with system actions and monitoring.
+- **Dashboard**: Interactive dashboard with quick stats, charts, and navigation.
 - **Attendance**: 
   - "Punch In" and "Punch Out" functionality.
   - View personal attendance history.
   - Automatic work hour calculation.
+  - Task hours tracking per attendance record.
 - **Leave Management**:
   - Apply for different types of leaves (Sick, Casual, Earned).
   - View leave history and status (Pending, Approved, Rejected).
-  - Admin interface to approve/reject leaves.
+  - Admin/HR interface to approve/reject leaves.
 - **Productivity (Task Management)**:
-  - Admin can assign tasks to employees.
+  - Admin can assign tasks to employees with project names.
   - Employees can view assigned tasks and update status (Pending, In Progress, Completed).
+  - Timer functionality to log work hours per task.
+  - Productivity score calculation.
   - Visual indicators for task status.
+- **Rules Engine** (.NET Service):
+  - Define custom access control rules.
+  - Automated rule evaluation.
+  - Alert generation for rule violations.
+- **System Actions** (Admin Only):
+  - Run reconciliation (detect attendance/leave conflicts).
+  - Calculate productivity scores.
+  - Evaluate access control rules.
+  - View system alerts.
 
 ## Tech Stack
 - **Frontend**: React (Vite), CSS (Modern/Glassmorphism)
 - **Backend**: Node.js, Express.js
+- **Microservice**: .NET Core (ASP.NET Core)
 - **Database**: MongoDB (Mongoose)
 - **Authentication**: JSON Web Tokens (JWT), bcryptjs
 
-## Setup Instructions
+## Quick Start
 
 ### Prerequisites
 - Node.js (v14+)
+- .NET SDK (v8.0+)
 - MongoDB (Local or Atlas)
 
-### Backend Setup
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file in the `backend` directory (optional, defaults provided in code for dev):
-   ```env
-   MONGO_URI=mongodb://localhost:27017/unified_employee_system
-   JWT_SECRET=your_jwt_secret
-   PORT=5000
-   ```
-4. Start the server:
-   ```bash
-   npm start
-   ```
-   The server will run on `http://localhost:5000`.
+### Easy Setup (Recommended)
+Run all services with a single command:
 
-### Frontend Setup
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-   ```
-   The application will open at `http://localhost:5173`.
+**Windows (PowerShell):**
+```powershell
+.\start-all.ps1
+```
+
+**Windows (Command Prompt):**
+```batch
+start-all.bat
+```
+
+This will:
+1. Seed the admin user
+2. Start the backend server
+3. Start the frontend development server
+4. Start the .NET microservice
+
+### Manual Setup
+
+#### 1. Backend Setup
+```bash
+cd backend
+npm install
+npm start
+```
+Server runs on `http://localhost:5000`
+
+#### 2. Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Application runs on `http://localhost:5173`
+
+#### 3. .NET Service Setup
+```bash
+cd dotnet_service
+dotnet run
+```
+Service runs on `http://localhost:5192`
+
+#### 4. Seed Admin User
+```bash
+cd backend
+node scripts/seedAdmin.js
+```
+
+## Default Credentials
+
+### Admin Account
+- **Email**: `admin@g.com`
+- **Password**: `admin`
 
 ## Development Tools
 
-### Reset Test User Script
-A utility script is available to quickly reset the database with a test user and generated data. This is useful for testing the dashboard and attendance features.
+### Seed Admin Script
+Creates an admin user in the database.
 
-**What it does:**
-1.  **Cleans Up**: Deletes the existing `test@example.com` user, their tasks, and attendance records.
-2.  **Creates User**: Registers a new `test@example.com` user with password `password123`.
-3.  **Assigns Tasks**: Creates 5 default tasks (linked to Projects A, B, D) with random statuses.
-4.  **Generates History**: Creates 7 days of historical attendance data with:
-    -   Random check-in/out times.
-    -   Random work hours (some < 4 hours for Absent, some < 9 hours for Early Leave).
-    -   Task hours distributed among assigned tasks.
+**Location**: `backend/scripts/seedAdmin.js`
 
 **How to run:**
-1.  Navigate to the backend directory:
-    ```bash
-    cd backend
-    ```
-2.  Run the script:
-    ```bash
-    npm run reset-user
-    ```
+```bash
+cd backend
+node scripts/seedAdmin.js
+```
+
+### Reset Test User Script
+A utility script to quickly reset the database with a test user and generated data.
+
+**What it does:**
+1. Cleans up existing `test@example.com` user data
+2. Creates new test user with password `password123`
+3. Assigns 5 default tasks
+4. Generates 7 days of historical attendance data
+
+**How to run:**
+```bash
+cd backend
+npm run reset-user
+```
 
 ## API Endpoints
 
@@ -106,11 +144,72 @@ A utility script is available to quickly reset the database with a test user and
 ### Leaves
 - `POST /api/leaves/apply` - Apply for leave
 - `GET /api/leaves/my-leaves` - Get user's leaves
-- `GET /api/leaves/all` - Get all leaves (Admin)
-- `PUT /api/leaves/:id/status` - Update leave status (Admin)
+- `GET /api/leaves/all` - Get all leaves (Admin/HR)
+- `PUT /api/leaves/:id/status` - Update leave status (Admin/HR)
 
 ### Tasks
 - `POST /api/tasks` - Create task (Admin)
 - `GET /api/tasks/my-tasks` - Get user's tasks
 - `PUT /api/tasks/:id/status` - Update task status
+- `PUT /api/tasks/:id/log-time` - Log time for task
 - `GET /api/tasks/users` - Get list of users (Admin)
+
+### Rules (Admin)
+- `GET /api/rules` - Get all rules
+- `POST /api/rules` - Create new rule
+- `DELETE /api/rules/:id` - Delete rule
+
+### Alerts
+- `GET /api/alerts` - Get all alerts
+
+### System Actions (Admin - via .NET Service)
+- `POST /api/system/reconcile` - Run reconciliation
+- `POST /api/system/calculate-productivity` - Calculate productivity scores
+- `POST /api/system/evaluate-rules` - Evaluate access control rules
+- `POST /api/system/run-all` - Run all system checks
+
+## Project Structure
+
+```
+unified_employee_system/
+├── backend/              # Node.js Express API
+│   ├── controllers/      # Route controllers
+│   ├── models/          # MongoDB models
+│   ├── routes/          # API routes
+│   ├── middleware/      # Auth middleware
+│   └── scripts/         # Utility scripts
+├── frontend/            # React application
+│   ├── src/
+│   │   ├── components/  # Reusable components
+│   │   ├── pages/       # Page components
+│   │   ├── context/     # React context
+│   │   └── utils/       # Utility functions
+├── dotnet_service/      # .NET Core microservice
+│   ├── Controllers/     # API controllers
+│   ├── Models/          # Data models
+│   └── Services/        # Business logic
+├── start-all.bat        # Windows batch startup script
+└── start-all.ps1        # PowerShell startup script
+```
+
+## Environment Variables
+
+### Backend (.env)
+```env
+MONGO_URI=mongodb://localhost:27017/unified_employee_system
+JWT_SECRET=your_jwt_secret
+PORT=5000
+```
+
+### .NET Service (appsettings.json)
+```json
+{
+  "ConnectionStrings": {
+    "MongoDbConnection": "mongodb://localhost:27017/unified_employee_system"
+  }
+}
+```
+
+## License
+MIT
+
