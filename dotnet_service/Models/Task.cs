@@ -31,8 +31,13 @@ namespace UnifiedEmployeeSystem.Service.Models
 
     public class TimeLog
     {
+        [BsonElement("startTime")]
         public DateTime StartTime { get; set; }
+
+        [BsonElement("endTime")]
         public DateTime EndTime { get; set; }
+
+        [BsonElement("duration")]
         public double Duration { get; set; } // in minutes
     }
 }
